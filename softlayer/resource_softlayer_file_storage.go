@@ -612,6 +612,8 @@ func WaitForStorageAvailable(d *schema.ResourceData, meta interface{}) (interfac
 				return false, "retry", nil
 			}
 
+			resultStr = strings.Replace(strings.Replace(resultStr, "\n", "", -1), "\r", "", -1)
+
 			if !strings.Contains(resultStr, "PROVISION_COMPLETED") &&
 				!strings.Contains(resultStr, "Volume Provisioning has completed") {
 				return result, "provisioning", nil
