@@ -641,7 +641,9 @@ func getPrice(productItems []datatypes.Product_Item, keyName string, categoryCod
 	for _, item := range productItems {
 		if strings.HasPrefix(*item.KeyName, keyName) {
 			for _, price := range item.Prices {
-				if *price.Categories[0].CategoryCode == categoryCode && price.LocationGroupId == nil {
+				// When price.LocationGroupId is null, xml-rpc returns <value> <string/> </value> and
+				// softlayer-go returns &0 instead of nil.
+				if *price.Categories[0].CategoryCode == categoryCode && (price.LocationGroupId == nil || *price.LocationGroupId == 0) {
 					if capacityRestrictionType == "STORAGE_SPACE" {
 						if price.CapacityRestrictionMinimum == nil ||
 							price.CapacityRestrictionMaximum == nil {
