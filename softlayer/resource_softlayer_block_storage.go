@@ -14,6 +14,13 @@ import (
 	"strings"
 )
 
+const (
+	blockStorageDetailMask = "id,capacityGb,iops,storageType,username,serviceResourceBackendIpAddress,properties[type]" +
+		",serviceResourceName,allowedIpAddresses,allowedSubnets," +
+		"allowedVirtualGuests[id,allowedHost[name,credential[username,password]]]," +
+		"allowedHardware[id,allowedHost[name,credential[username,password]]],snapshotCapacityGb,osType"
+)
+
 func resourceSoftLayerBlockStorage() *schema.Resource {
 	return &schema.Resource{
 		Create:   resourceSoftLayerBlockStorageCreate,
@@ -248,7 +255,7 @@ func resourceSoftLayerBlockStorageRead(d *schema.ResourceData, meta interface{})
 
 	storage, err := services.GetNetworkStorageService(sess).
 		Id(storageId).
-		Mask(storageDetailMask).
+		Mask(blockStorageDetailMask).
 		GetObject()
 
 	if err != nil {
@@ -333,7 +340,7 @@ func resourceSoftLayerBlockStorageUpdate(d *schema.ResourceData, meta interface{
 
 	storage, err := services.GetNetworkStorageService(sess).
 		Id(id).
-		Mask(storageDetailMask).
+		Mask(blockStorageDetailMask).
 		GetObject()
 
 	if err != nil {

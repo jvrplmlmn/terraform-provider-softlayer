@@ -23,8 +23,14 @@ const (
 	storagePerformancePackageType = "ADDITIONAL_SERVICES_PERFORMANCE_STORAGE"
 	storageEndurancePackageType   = "ADDITIONAL_SERVICES_ENTERPRISE_STORAGE"
 	storageMask                   = "id,billingItem.orderItem.order.id"
-	storageDetailMask             = "id,capacityGb,iops,storageType,username,serviceResourceBackendIpAddress,properties[type]" +
-		",serviceResourceName,allowedIpAddresses,allowedSubnets,allowedVirtualGuests[id,allowedHost[name,credential[username,password]]],allowedHardware[id,allowedHost[name,credential[username,password]]],snapshotCapacityGb,osType"
+
+	// Use different objectMasks for blockstorage and filestorage. xml-rpc returns array data type instead of struct type
+	// when allowedHost is empty and it generates unmashal error in softlayer-go library. This is a bug of SoftLayer API.
+
+	fileStorageDetailMask = "id,capacityGb,iops,storageType,username,serviceResourceBackendIpAddress,properties[type]" +
+		",serviceResourceName,allowedIpAddresses,allowedSubnets," +
+		"allowedVirtualGuests[id],allowedHardware[id],snapshotCapacityGb,osType"
+
 	itemMask        = "id,capacity,description,units,keyName,prices[id,categories[id,name,categoryCode],capacityRestrictionMinimum,capacityRestrictionMaximum,locationGroupId]"
 	enduranceType   = "Endurance"
 	performanceType = "Performance"
@@ -243,7 +249,7 @@ func resourceSoftLayerFileStorageRead(d *schema.ResourceData, meta interface{}) 
 
 	storage, err := services.GetNetworkStorageService(sess).
 		Id(storageId).
-		Mask(storageDetailMask).
+		Mask(fileStorageDetailMask).
 		GetObject()
 
 	if err != nil {
@@ -318,7 +324,7 @@ func resourceSoftLayerFileStorageUpdate(d *schema.ResourceData, meta interface{}
 
 	storage, err := services.GetNetworkStorageService(sess).
 		Id(id).
-		Mask(storageDetailMask).
+		Mask(fileStorageDetailMask).
 		GetObject()
 
 	if err != nil {
