@@ -600,20 +600,22 @@ func WaitForStorageAvailable(d *schema.ResourceData, meta interface{}) (interfac
 
 			// Check volume status.
 			log.Println("Checking volume status.")
-			resultStr := ""
+			var resultObj interface{}
 			err = sess.DoRequest(
 				"SoftLayer_Network_Storage",
 				"getObject",
 				nil,
 				&sl.Options{Id: &id, Mask: "volumeStatus"},
-				&resultStr,
+				&resultObj,
 			)
 			if err != nil {
+				log.Printf("********** ERROR %s", err.Error())
 				return false, "retry", nil
 			}
 
-			resultStr = strings.Replace(strings.Replace(resultStr, "\n", "", -1), "\r", "", -1)
-
+			//resultStr = strings.Replace(strings.Replace(resultStr, "\n", "", -1), "\r", "", -1)
+			resultStr := fmt.Sprintf("%v", resultObj)
+			log.Printf("*********** RESULTSTR %s", resultStr)
 			if !strings.Contains(resultStr, "PROVISION_COMPLETED") &&
 				!strings.Contains(resultStr, "Volume Provisioning has completed") {
 				return result, "provisioning", nil
